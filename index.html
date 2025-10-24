@@ -1,89 +1,481 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>卡通刮刮乐 CDK</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body,html{height:100%;overflow:hidden;background:#000;font-family:'Arial',sans-serif;}
-    #container{position:relative;width:100%;height:100%;}
-    #bg{position:absolute;width:100%;height:100%;background:url('https://cdn.pixabay.com/photo/2021/08/25/15/40/gamer-6573592_1280.jpg') center/cover;}
-    #title{position:absolute;width:100%;text-align:center;top:15%;color:#fff;font:bold 28px/1.2 'Comic Sans MS',sans-serif;text-shadow:0 0 10px #000, 0 0 20px #f0f;}
-    #scratchpad{position:absolute;width:85%;max-width:500px;height:45%;max-height:280px;top:50%;left:50%;transform:translate(-50%,-50%);cursor:pointer;border:4px solid #fff;border-radius:20px;box-shadow:0 0 30px rgba(255,255,255,0.6);}
-    canvas{z-index:2;border-radius:16px;}
-    #hint{position:absolute;bottom:10%;width:100%;text-align:center;color:#ff0;font:bold 16px Arial;text-shadow:0 0 8px #000;}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黑神话悟空 - 赛博刮刮乐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a0a0a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 赛博背景动画 */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 0, 255, 0.03) 2px, rgba(255, 0, 255, 0.03) 4px),
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 255, 255, 0.03) 2px, rgba(0, 255, 255, 0.03) 4px);
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+            letter-spacing: 3px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            color: #00ffff;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .card-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 20px;
+        }
+
+        .card {
+            position: relative;
+            width: 400px;
+            height: 250px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 
+                0 0 30px rgba(255, 0, 255, 0.5),
+                0 0 60px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, #1a0033 0%, #330066 100%);
+            border: 2px solid rgba(255, 0, 255, 0.5);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 0, 255, 0.3), transparent);
+            animation: borderRotate 3s linear infinite;
+        }
+
+        @keyframes borderRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            z-index: 1;
+        }
+
+        .cdk-label {
+            color: #00ffff;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .cdk-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.8em;
+            color: #ff00ff;
+            background: rgba(255, 0, 255, 0.1);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            color: #000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 20;
+            pointer-events: auto;
+        }
+
+        .copy-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .hint {
+            color: #00ffff;
+            margin-top: 30px;
+            font-size: 1.1em;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #00ffff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00ffff;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(50px); opacity: 0; }
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #330066, #660099);
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            padding: 10px 25px;
+            font-size: 0.9em;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .reset-btn:hover {
+            background: linear-gradient(45deg, #660099, #330066);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
+        }
+    </style>
 </head>
 <body>
-  <div id="container">
-    <div id="bg"></div>
-    <div id="title">🎮 卡通大礼包！<br>刮开领取 Steam CDK！</div>
-    <canvas id="scratchpad" width="500" height="280"></canvas>
-    <div id="hint">用手指或鼠标刮开哦~</div>
-  </div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>⚡ 黑神话：悟空 ⚡</h1>
+        <p class="subtitle">CYBER SCRATCH CARD</p>
+        
+        <div class="card-wrapper">
+            <div class="card">
+                <div class="card-content">
+                    <div class="cdk-label">[ CDK 激活码 ]</div>
+                    <div class="cdk-code" id="cdkCode">XXXX-XXXX-XXXX-XXXX</div>
+                    <button class="copy-btn" onclick="copyCDK()">复制激活码</button>
+                </div>
+                <canvas id="scratchCanvas"></canvas>
+            </div>
+        </div>
+        
+        <p class="hint">👆 用鼠标刮开涂层获取激活码</p>
+        <button class="reset-btn" onclick="resetCard()">🔄 重置刮刮乐</button>
+    </div>
 
-  <script>
-    const canvas = document.getElementById('scratchpad');
-    const ctx = canvas.getContext('2d');
-    const cdkLines = [
-      "你的 CDK：",
-      "ABCDE-FGHIJ-KLMNO"  // ← 改成你的真实 CDK
-    ];
+    <script>
+        // 你的CDK码列表（可以添加多个）
+        const cdkList = [
+            'WUKONG-2024-GAME-ABCD',
+            'MONKEY-KING-EPIC-1234',
+            'DESTINED-ONE-HERO-5678'
+        ];
 
-    // 刮层（卡通风灰色）
-    ctx.fillStyle = '#888';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 32px Arial';
-    ctx.fillStyle = '#0f0';
-    ctx.textAlign = 'center';
-    ctx.globalCompositeOperation = 'destination-out';
+        // 随机选择一个CDK
+        let currentCDK = cdkList[Math.floor(Math.random() * cdkList.length)];
+        document.getElementById('cdkCode').textContent = currentCDK;
 
-    let isDrawing = false;
+        const canvas = document.getElementById('scratchCanvas');
+        const ctx = canvas.getContext('2d');
+        const card = document.querySelector('.card');
 
-    // 鼠标事件
-    canvas.addEventListener('mousedown', start);
-    canvas.addEventListener('mouseup', stop);
-    canvas.addEventListener('mousemove', draw);
+        // 设置canvas尺寸
+        canvas.width = card.offsetWidth;
+        canvas.height = card.offsetHeight;
 
-    // 手机触控
-    canvas.addEventListener('touchstart', e => { e.preventDefault(); start(e.touches[0]); });
-    canvas.addEventListener('touchend', stop);
-    canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0]); });
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
 
-    function start(e) {
-      isDrawing = true;
-      draw(e);
-    }
-    function stop() {
-      isDrawing = false;
-    }
-    function draw(e) {
-      if (!isDrawing) return;
-      const rect = canvas.getBoundingClientRect();
-      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-      ctx.beginPath();
-      ctx.arc(x, y, 35, 0, Math.PI * 2);
-      ctx.fill();
+        // 绘制涂层
+        function drawCoating() {
+            // 渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#ff00ff');
+            gradient.addColorStop(0.5, '#00ffff');
+            gradient.addColorStop(1, '#ff00ff');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 刮开 50% 显示 CDK
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      let transparent = 0;
-      for (let i = 3; i < imageData.data.length; i += 4) {
-        if (imageData.data[i] === 0) transparent++;
-      }
-      if (transparent > imageData.data.length / 4 * 0.5) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00ff00';
-        ctx.font = 'bold 32px Arial';
-        cdkLines.forEach((line, i) => {
-          ctx.fillText(line, canvas.width/2, canvas.height/2 - 30 + i*50);
+            // 添加网格纹理
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+
+            // 添加文字
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.font = 'bold 40px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('刮开有惊喜', canvas.width / 2, canvas.height / 2 - 20);
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText('BLACK MYTH', canvas.width / 2, canvas.height / 2 + 20);
+        }
+
+        drawCoating();
+
+        // 刮擦功能
+        function scratch(x, y) {
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 30, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 创建粒子效果
+            createParticle(x, y);
+            
+            // 检查刮开程度，如果刮开足够多就隐藏canvas
+            checkScratchProgress();
+        }
+
+        function checkScratchProgress() {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparentPixels = 0;
+            
+            for (let i = 3; i < pixels.length; i += 4) {
+                if (pixels[i] < 128) {
+                    transparentPixels++;
+                }
+            }
+            
+            const totalPixels = pixels.length / 4;
+            const scratchedPercentage = (transparentPixels / totalPixels) * 100;
+            
+            // 如果刮开超过40%，隐藏canvas让按钮可点击
+            if (scratchedPercentage > 40) {
+                canvas.style.pointerEvents = 'none';
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+            scratch(lastX, lastY);
         });
-      }
-    }
-  </script>
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 画线连接
+            ctx.lineWidth = 60;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+            
+            createParticle(x, y);
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDrawing = false;
+        });
+
+        // 触摸支持
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            lastX = touch.clientX - rect.left;
+            lastY = touch.clientY - rect.top;
+            scratch(lastX, lastY);
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            ctx.lineWidth = 60;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+            
+            createParticle(x, y);
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isDrawing = false;
+        });
+
+        // 复制CDK
+        function copyCDK() {
+            const cdkText = document.getElementById('cdkCode').textContent;
+            navigator.clipboard.writeText(cdkText).then(() => {
+                const btn = event.target;
+                btn.textContent = '✓ 已复制';
+                setTimeout(() => {
+                    btn.textContent = '复制激活码';
+                }, 2000);
+            });
+        }
+
+        // 重置刮刮乐
+        function resetCard() {
+            ctx.globalCompositeOperation = 'source-over';
+            canvas.style.pointerEvents = 'auto';
+            drawCoating();
+            // 随机更换CDK
+            currentCDK = cdkList[Math.floor(Math.random() * cdkList.length)];
+            document.getElementById('cdkCode').textContent = currentCDK;
+        }
+
+        // 创建粒子效果
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = (card.offsetLeft + x) + 'px';
+            particle.style.top = (card.offsetTop + y) + 'px';
+            particle.style.animationDelay = Math.random() * 0.5 + 's';
+            document.querySelector('.particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 4000);
+        }
+
+        // 创建背景粒子
+        function createBackgroundParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * window.innerWidth + 'px';
+                particle.style.top = Math.random() * window.innerHeight + 'px';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                document.getElementById('particles').appendChild(particle);
+            }
+        }
+
+        createBackgroundParticles();
+    </script>
 </body>
 </html>
