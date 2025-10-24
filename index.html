@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>卡通刮刮乐 CDK</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body,html{height:100%;overflow:hidden;background:#000;font-family:'Arial',sans-serif;}
+    #container{position:relative;width:100%;height:100%;}
+    #bg{position:absolute;width:100%;height:100%;background:url('https://cdn.pixabay.com/photo/2021/08/25/15/40/gamer-6573592_1280.jpg') center/cover;}
+    #title{position:absolute;width:100%;text-align:center;top:15%;color:#fff;font:bold 28px/1.2 'Comic Sans MS',sans-serif;text-shadow:0 0 10px #000, 0 0 20px #f0f;}
+    #scratchpad{position:absolute;width:85%;max-width:500px;height:45%;max-height:280px;top:50%;left:50%;transform:translate(-50%,-50%);cursor:pointer;border:4px solid #fff;border-radius:20px;box-shadow:0 0 30px rgba(255,255,255,0.6);}
+    canvas{z-index:2;border-radius:16px;}
+    #hint{position:absolute;bottom:10%;width:100%;text-align:center;color:#ff0;font:bold 16px Arial;text-shadow:0 0 8px #000;}
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="bg"></div>
+    <div id="title">🎮 卡通大礼包！<br>刮开领取 Steam CDK！</div>
+    <canvas id="scratchpad" width="500" height="280"></canvas>
+    <div id="hint">用手指或鼠标刮开哦~</div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('scratchpad');
+    const ctx = canvas.getContext('2d');
+    const cdkLines = [
+      "你的 CDK：",
+      "ABCDE-FGHIJ-KLMNO"  // ← 改成你的真实 CDK
+    ];
+
+    // 刮层（卡通风灰色）
+    ctx.fillStyle = '#888';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = 'bold 32px Arial';
+    ctx.fillStyle = '#0f0';
+    ctx.textAlign = 'center';
+    ctx.globalCompositeOperation = 'destination-out';
+
+    let isDrawing = false;
+
+    // 鼠标事件
+    canvas.addEventListener('mousedown', start);
+    canvas.addEventListener('mouseup', stop);
+    canvas.addEventListener('mousemove', draw);
+
+    // 手机触控
+    canvas.addEventListener('touchstart', e => { e.preventDefault(); start(e.touches[0]); });
+    canvas.addEventListener('touchend', stop);
+    canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e.touches[0]); });
+
+    function start(e) {
+      isDrawing = true;
+      draw(e);
+    }
+    function stop() {
+      isDrawing = false;
+    }
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+      ctx.beginPath();
+      ctx.arc(x, y, 35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 刮开 50% 显示 CDK
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let transparent = 0;
+      for (let i = 3; i < imageData.data.length; i += 4) {
+        if (imageData.data[i] === 0) transparent++;
+      }
+      if (transparent > imageData.data.length / 4 * 0.5) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#00ff00';
+        ctx.font = 'bold 32px Arial';
+        cdkLines.forEach((line, i) => {
+          ctx.fillText(line, canvas.width/2, canvas.height/2 - 30 + i*50);
+        });
+      }
+    }
+  </script>
+</body>
+</html>
