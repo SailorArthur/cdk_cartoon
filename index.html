@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神秘 - 刮刮乐</title>
+    <title>神秘的礼物</title>
     <style>
         * {
             margin: 0;
@@ -47,7 +47,7 @@
         }
 
         h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             margin-bottom: 20px;
             background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff);
             -webkit-background-clip: text;
@@ -69,6 +69,136 @@
             margin-bottom: 40px;
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
             letter-spacing: 2px;
+        }
+
+        /* 验证码界面 */
+        .auth-screen {
+            background: rgba(10, 10, 30, 0.9);
+            border: 2px solid rgba(255, 0, 255, 0.5);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 
+                0 0 40px rgba(255, 0, 255, 0.5),
+                0 0 80px rgba(0, 255, 255, 0.3),
+                inset 0 0 30px rgba(255, 255, 255, 0.05);
+            animation: borderPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes borderPulse {
+            0%, 100% { box-shadow: 0 0 40px rgba(255, 0, 255, 0.5), 0 0 80px rgba(0, 255, 255, 0.3); }
+            50% { box-shadow: 0 0 60px rgba(255, 0, 255, 0.8), 0 0 100px rgba(0, 255, 255, 0.5); }
+        }
+
+        .auth-title {
+            color: #ff00ff;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        }
+
+        .auth-subtitle {
+            color: #00ffff;
+            font-size: 1em;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .input-label {
+            color: #00ffff;
+            font-size: 0.9em;
+            display: block;
+            text-align: left;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1em;
+            text-align: center;
+            letter-spacing: 3px;
+            transition: all 0.3s;
+            font-family: 'Courier New', monospace;
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .verify-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .verify-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+        }
+
+        .verify-btn:active {
+            transform: scale(0.95);
+        }
+
+        .error-message {
+            color: #ff0066;
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 0, 102, 0.8);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .attempts-info {
+            color: #ffcc00;
+            font-size: 0.85em;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        /* 刮刮乐界面 */
+        .scratch-screen {
+            display: none;
+        }
+
+        .scratch-screen.active {
+            display: block;
         }
 
         .card-wrapper {
@@ -235,55 +365,226 @@
             background: linear-gradient(45deg, #660099, #330066);
             box-shadow: 0 0 25px rgba(0, 255, 255, 0.6);
         }
+
+        .logout-btn {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff6666;
+            border: 2px solid #ff6666;
+            padding: 8px 20px;
+            font-size: 0.85em;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 0, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 102, 102, 0.5);
+        }
+
+        .info-text {
+            color: rgba(0, 255, 255, 0.6);
+            font-size: 0.85em;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
     <div class="particles" id="particles"></div>
     
     <div class="container">
-        <h1>⚡ 收下这神秘的CDK，愿你游戏愉快～生活美满～ ⚡</h1>
+         <h1>⚡ 收下这神秘的CDK，愿你游戏愉快～生活美满～ ⚡</h1>
         <p class="subtitle">CYBER SCRATCH CARD</p>
         
-        <div class="card-wrapper">
-            <div class="card">
-                <div class="card-content">
-                    <div class="cdk-label">[ 赠友～卡莎彭 ]</div>
-                    <div class="cdk-code" id="cdkCode">XXXX-XXXX-XXXX-XXXX</div>
-                    <button class="copy-btn" onclick="copyCDK()">复制激活码</button>
-                </div>
-                <canvas id="scratchCanvas"></canvas>
+        <!-- 验证码界面 -->
+        <div class="auth-screen" id="authScreen">
+            <div class="auth-title">🔐 安全验证</div>
+            <div class="auth-subtitle">SECURITY VERIFICATION</div>
+            
+            <div class="input-group">
+                <label class="input-label">访问码 / ACCESS CODE</label>
+                <input type="password" 
+                       class="auth-input" 
+                       id="accessCode" 
+                       placeholder="请输入访问码"
+                       maxlength="20">
+            </div>
+            
+            <button class="verify-btn" onclick="verifyAccess()">
+                验证并进入 / VERIFY
+            </button>
+            
+            <div class="error-message" id="errorMessage">
+                ⚠️ 访问码错误，请重试
+            </div>
+            
+            <div class="attempts-info" id="attemptsInfo">
+                剩余尝试次数: <span id="attemptsCount">5</span>
+            </div>
+            
+            <div class="info-text">
+                💡 提示：请向管理员获取访问码<br>
+                多次输入错误将被暂时锁定
             </div>
         </div>
         
-        <p class="hint">👆 用鼠标刮开涂层获取激活码</p>
-        <button class="reset-btn" onclick="resetCard()">🔄 重置刮刮乐</button>
+        <!-- 刮刮乐界面 -->
+        <div class="scratch-screen" id="scratchScreen">
+            <div class="card-wrapper">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="cdk-label">[ 赠吾友～卡莎彭 ]</div>
+                        <div class="cdk-code" id="cdkCode">XXXX-XXXX-XXXX-XXXX</div>
+                        <button class="copy-btn" onclick="copyCDK()">复制激活码</button>
+                    </div>
+                    <canvas id="scratchCanvas"></canvas>
+                </div>
+            </div>
+            
+            <p class="hint">👆 用鼠标刮开涂层获取激活码</p>
+            <button class="reset-btn" onclick="resetCard()">🔄 重置刮刮乐</button>
+            <button class="logout-btn" onclick="logout()">🚪 退出登录</button>
+        </div>
     </div>
 
     <script>
-        // 你的CDK码列表（可以添加多个）
+        // ========== 安全配置 ==========
+        // 设置你的访问码（可以设置多个）
+        const validAccessCodes = [
+            'kashapeng'
+        ];
+        
+        let attemptsLeft = 5;
+        let isLocked = false;
+        let lockoutTime = 0;
+
+        // ========== CDK配置 ==========
         const cdkList = [
             'WUKONG-2024-GAME-ABCD'
         ];
 
-        // 随机选择一个CDK
         let currentCDK = cdkList[Math.floor(Math.random() * cdkList.length)];
-        document.getElementById('cdkCode').textContent = currentCDK;
 
-        const canvas = document.getElementById('scratchCanvas');
-        const ctx = canvas.getContext('2d');
-        const card = document.querySelector('.card');
+        // ========== 验证功能 ==========
+        function verifyAccess() {
+            if (isLocked) {
+                const remainingTime = Math.ceil((lockoutTime - Date.now()) / 1000);
+                showError(`账号已锁定，请等待 ${remainingTime} 秒`);
+                return;
+            }
 
-        // 设置canvas尺寸
-        canvas.width = card.offsetWidth;
-        canvas.height = card.offsetHeight;
+            const inputCode = document.getElementById('accessCode').value.trim();
+            
+            if (!inputCode) {
+                showError('请输入访问码');
+                return;
+            }
 
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
+            // 验证访问码
+            if (validAccessCodes.includes(inputCode)) {
+                // 验证成功
+                document.getElementById('authScreen').classList.remove('active');
+                document.getElementById('scratchScreen').classList.add('active');
+                initScratchCard();
+                
+                // 记录访问时间
+                sessionStorage.setItem('authenticated', 'true');
+                sessionStorage.setItem('authTime', Date.now().toString());
+            } else {
+                // 验证失败
+                attemptsLeft--;
+                document.getElementById('attemptsCount').textContent = attemptsLeft;
+                
+                if (attemptsLeft <= 0) {
+                    lockAccount();
+                } else {
+                    showError(`访问码错误，剩余 ${attemptsLeft} 次机会`);
+                }
+                
+                // 清空输入框
+                document.getElementById('accessCode').value = '';
+            }
+        }
 
-        // 绘制涂层
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            errorEl.textContent = '⚠️ ' + message;
+            errorEl.classList.add('show');
+            
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 3000);
+        }
+
+        function lockAccount() {
+            isLocked = true;
+            lockoutTime = Date.now() + 60000; // 锁定60秒
+            
+            showError('尝试次数过多，账号已锁定60秒');
+            document.getElementById('accessCode').disabled = true;
+            
+            setTimeout(() => {
+                isLocked = false;
+                attemptsLeft = 5;
+                document.getElementById('attemptsCount').textContent = attemptsLeft;
+                document.getElementById('accessCode').disabled = false;
+                showError('账号已解锁，请重新尝试');
+            }, 60000);
+        }
+
+        // 回车键提交
+        document.getElementById('accessCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyAccess();
+            }
+        });
+
+        // 退出登录
+        function logout() {
+            sessionStorage.removeItem('authenticated');
+            sessionStorage.removeItem('authTime');
+            document.getElementById('scratchScreen').classList.remove('active');
+            document.getElementById('authScreen').classList.add('active');
+            document.getElementById('accessCode').value = '';
+            attemptsLeft = 5;
+            document.getElementById('attemptsCount').textContent = attemptsLeft;
+        }
+
+        // 检查会话是否过期（可选：设置30分钟过期）
+        function checkSession() {
+            const authenticated = sessionStorage.getItem('authenticated');
+            const authTime = parseInt(sessionStorage.getItem('authTime') || '0');
+            const sessionDuration = 30 * 60 * 1000; // 30分钟
+            
+            if (authenticated === 'true' && (Date.now() - authTime) < sessionDuration) {
+                document.getElementById('authScreen').classList.remove('active');
+                document.getElementById('scratchScreen').classList.add('active');
+                initScratchCard();
+            }
+        }
+
+        // 页面加载时检查会话
+        window.addEventListener('load', checkSession);
+
+        // ========== 刮刮乐功能 ==========
+        let canvas, ctx;
+
+        function initScratchCard() {
+            canvas = document.getElementById('scratchCanvas');
+            ctx = canvas.getContext('2d');
+            const card = document.querySelector('.card');
+
+            canvas.width = card.offsetWidth;
+            canvas.height = card.offsetHeight;
+
+            document.getElementById('cdkCode').textContent = currentCDK;
+            drawCoating();
+            setupScratchEvents();
+        }
+
         function drawCoating() {
-            // 渐变背景
             const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             gradient.addColorStop(0, '#ff00ff');
             gradient.addColorStop(0.5, '#00ffff');
@@ -291,7 +592,6 @@
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 添加网格纹理
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
             ctx.lineWidth = 1;
             for (let i = 0; i < canvas.width; i += 20) {
@@ -307,7 +607,6 @@
                 ctx.stroke();
             }
 
-            // 添加文字
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
             ctx.font = 'bold 40px Arial';
             ctx.textAlign = 'center';
@@ -317,20 +616,91 @@
             ctx.fillText('BLACK MYTH', canvas.width / 2, canvas.height / 2 + 20);
         }
 
-        drawCoating();
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
 
-        // 刮擦功能
-        function scratch(x, y) {
+        function setupScratchEvents() {
+            canvas.addEventListener('mousedown', startScratch);
+            canvas.addEventListener('mousemove', scratch);
+            canvas.addEventListener('mouseup', stopScratch);
+            canvas.addEventListener('mouseleave', stopScratch);
+            
+            canvas.addEventListener('touchstart', startScratchTouch);
+            canvas.addEventListener('touchmove', scratchTouch);
+            canvas.addEventListener('touchend', stopScratch);
+        }
+
+        function startScratch(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+            scratchAt(lastX, lastY);
+        }
+
+        function scratch(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = 60;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+            createParticle(x, y);
+            checkScratchProgress();
+        }
+
+        function stopScratch() {
+            isDrawing = false;
+        }
+
+        function startScratchTouch(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            lastX = touch.clientX - rect.left;
+            lastY = touch.clientY - rect.top;
+            scratchAt(lastX, lastY);
+        }
+
+        function scratchTouch(e) {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+            
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.lineWidth = 60;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            
+            lastX = x;
+            lastY = y;
+            createParticle(x, y);
+            checkScratchProgress();
+        }
+
+        function scratchAt(x, y) {
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
             ctx.arc(x, y, 30, 0, Math.PI * 2);
             ctx.fill();
-            
-            // 创建粒子效果
             createParticle(x, y);
-            
-            // 检查刮开程度，如果刮开足够多就隐藏canvas
-            checkScratchProgress();
         }
 
         function checkScratchProgress() {
@@ -347,85 +717,11 @@
             const totalPixels = pixels.length / 4;
             const scratchedPercentage = (transparentPixels / totalPixels) * 100;
             
-            // 如果刮开超过40%，隐藏canvas让按钮可点击
             if (scratchedPercentage > 40) {
                 canvas.style.pointerEvents = 'none';
             }
         }
 
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            lastX = e.clientX - rect.left;
-            lastY = e.clientY - rect.top;
-            scratch(lastX, lastY);
-        });
-
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // 画线连接
-            ctx.lineWidth = 60;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            
-            lastX = x;
-            lastY = y;
-            
-            createParticle(x, y);
-        });
-
-        canvas.addEventListener('mouseup', () => {
-            isDrawing = false;
-        });
-
-        canvas.addEventListener('mouseleave', () => {
-            isDrawing = false;
-        });
-
-        // 触摸支持
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            lastX = touch.clientX - rect.left;
-            lastY = touch.clientY - rect.top;
-            scratch(lastX, lastY);
-        });
-
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-            if (!isDrawing) return;
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const x = touch.clientX - rect.left;
-            const y = touch.clientY - rect.top;
-            
-            ctx.lineWidth = 60;
-            ctx.lineCap = 'round';
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
-            ctx.stroke();
-            
-            lastX = x;
-            lastY = y;
-            
-            createParticle(x, y);
-        });
-
-        canvas.addEventListener('touchend', () => {
-            isDrawing = false;
-        });
-
-        // 复制CDK
         function copyCDK() {
             const cdkText = document.getElementById('cdkCode').textContent;
             navigator.clipboard.writeText(cdkText).then(() => {
@@ -437,20 +733,18 @@
             });
         }
 
-        // 重置刮刮乐
         function resetCard() {
             ctx.globalCompositeOperation = 'source-over';
             canvas.style.pointerEvents = 'auto';
             drawCoating();
-            // 随机更换CDK
             currentCDK = cdkList[Math.floor(Math.random() * cdkList.length)];
             document.getElementById('cdkCode').textContent = currentCDK;
         }
 
-        // 创建粒子效果
         function createParticle(x, y) {
             const particle = document.createElement('div');
             particle.className = 'particle';
+            const card = document.querySelector('.card');
             particle.style.left = (card.offsetLeft + x) + 'px';
             particle.style.top = (card.offsetTop + y) + 'px';
             particle.style.animationDelay = Math.random() * 0.5 + 's';
@@ -461,7 +755,6 @@
             }, 4000);
         }
 
-        // 创建背景粒子
         function createBackgroundParticles() {
             for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
